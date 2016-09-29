@@ -14,7 +14,7 @@ install:
   - export PATH="$DOTNET_INSTALL_DIR:$PATH"  
 script:
   - dir
-  - dotnet build -c Release
-  - dotnet publsh -c Release
-  - cd /bin/Release/netcoreapp1.0/publish
-  - docker build -t dustinmoris/newshacker .
+  - dotnet restore
+  - dotnet build -c Release src
+  - dotnet publish -c Release src
+  - docker build -t dustinmoris/newshacker src/bin/Release/netcoreapp1.0/publish/.
