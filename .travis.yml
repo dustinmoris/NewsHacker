@@ -18,3 +18,4 @@ script:
   - dotnet publsh -c Release
   - cd /bin/Release/netcoreapp1.0/publish
   - docker build -t dustinmoris/newshacker .
+  - dotnet --version
