@@ -27,8 +27,7 @@
   },
   "publishOptions": {
     "include": [
-      "Dockerfile",
-      "../semver.ps1"
+      "Dockerfile"
     ]
   }
 }

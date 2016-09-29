@@ -1,8 +1,7 @@
-language: csharp  
 sudo: required  
 dist: trusty  
 env:  
-  - CLI_VERSION=latest DOTNET_CLI_TELEMETRY_OPTOUT=1
+  - CLI_VERSION=latest DOTNET_CLI_TELEMETRY_OPTOUT=1 MAJOR_VER=0 MINOR_VER=1 BUILD_VER=0
 os:  
   - linux
 branches:  
@@ -12,15 +11,11 @@ install:
   - export DOTNET_INSTALL_DIR="$PWD/.dotnetcli"
   - curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh | bash /dev/stdin --version "$CLI_VERSION" --install-dir "$DOTNET_INSTALL_DIR"
   - export PATH="$DOTNET_INSTALL_DIR:$PATH"
-  - wget "https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-alpha.10/powershell_6.0.0-alpha.10-1ubuntu1.14.04.1_amd64.deb"
-  - sudo apt-get install libunwind8 libicu52
-  - sudo dpkg -i powershell_6.0.0-alpha.10-1ubuntu1.14.04.1_amd64.deb
 script:
   - dotnet restore
   - dotnet build -c Release src
   - dotnet publish -c Release src
 after_success:
-  - powershell src/bin/Release/netcoreapp1.0/publish/semver.ps1 "NewsHacker.dll"
   - docker build -t dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER src/bin/Release/netcoreapp1.0/publish/.
   - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:$MAJOR_VER
   - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
