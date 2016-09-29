@@ -1,7 +1,7 @@
 {
+  "name": "NewsHacker",
   "version": "1.0.0-*",
   "buildOptions": {
-    "debugType": "portable",
     "emitEntryPoint": true,
     "compilerName": "fsc",
     "compile": {
@@ -13,8 +13,7 @@
   "tools": {
     "dotnet-compile-fsc": "1.0.0-preview2-*"
   },
-  "frameworks": {
-    
+  "frameworks": {    
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
@@ -25,5 +24,10 @@
         "System.Xml.XDocument": "4.0.11"
       }
     }
+  },
+  "publishOptions": {
+    "include": [
+      "Dockerfile"
+    ]
   }
 }

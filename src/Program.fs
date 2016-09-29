@@ -7,11 +7,13 @@
 // ==========================================================
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Net
 open System.Net.Http
 open System.Text.RegularExpressions
+open System.Threading
 open System.Xml.Linq
 
 // ----------------------------------------------------------
@@ -24,7 +26,7 @@ type NewsArticle =
         Title       : string
         PublishDate : DateTime
     }
-    member this.ToHackerNewsSubmitFormData (fnid : string) =
+    member this.ToHackerNewsFormData (fnid : string) =
         dict
             [ 
                 "fnid",     fnid; 
@@ -34,7 +36,7 @@ type NewsArticle =
                 "text",     "";
             ]
 
-type Minutes = float
+type Seconds = float
 
 // ----------------------------------------------------------
 // Config
@@ -56,6 +58,11 @@ module Config =
 
 module Curler =
 
+    let printInfo (data : KeyValuePair<string, string> seq ) =
+        let title = data |> Seq.find (fun (x : KeyValuePair<string,string>) -> x.Key = "title")
+        let url   = data |> Seq.find (fun (x : KeyValuePair<string,string>) -> x.Key = "url")
+        printfn "Publising [%s](%s)" title.Value url.Value
+
     let runSynchronously task =
         task
         |> Async.AwaitTask
@@ -72,8 +79,9 @@ module Curler =
         |> runSynchronously
 
     let postForm (httpClient : HttpClient) (url : string) (data) =      
+        printInfo data
         httpClient.PostAsync(url, new FormUrlEncodedContent(data))
-        |> runSynchronously
+        |> runSynchronously        
         |> ignore
 
 // ----------------------------------------------------------
@@ -120,17 +128,23 @@ module FeedParser =
 // Set config values
 let newsFeeds =
     [
+        "http://feeds.feedburner.com/TechCrunch/"
         "http://feeds.feedburner.com/TechCrunchIT"
         "http://feeds.feedburner.com/TechCrunch/Microsoft"
         "http://feeds.feedburner.com/TechCrunch/Twitter"
         "http://feeds.feedburner.com/TechCrunch/Google"
+        "http://feeds.hanselman.com/ScottHanselman"
+        "http://feeds.feedburner.com/TroyHunt"
+        "https://blogs.msdn.microsoft.com/dotnet/feed/"
+        "http://techblog.netflix.com/rss.xml"
     ]
 
 let hackerNewsBaseUrl       = "https://news.ycombinator.com"
 let hackerNewsFormUrl       = hackerNewsBaseUrl + "/submit"
 let hackerNewsFormActionUrl = hackerNewsBaseUrl + "/r"
 let userCookieValue         = Config.getValue "USER_COOKIE"
-let maxAgeInMinutes         = Config.getValue "MAX_AGE" |> Double.Parse
+let maxAgeInSeconds         = Config.getValue "MAX_AGE"    |> Double.Parse
+let sleepTimeInSeconds      = Config.getValue "SLEEP_TIME" |> Double.Parse
 
 // Configure HttpClient for querying news newsFeeds
 let defaultHttpClient = new HttpClient()
@@ -155,26 +169,35 @@ let getNewFnid() =
     ||> Curler.getString
     |> extractFnid
 
-let ConvertToFormData (article : NewsArticle) =
-    article.ToHackerNewsSubmitFormData (getNewFnid())
+let convertToFormData (article : NewsArticle) =
+    article.ToHackerNewsFormData (getNewFnid())
 
-let filterArticlesByAge (maxAgeInMinutes    : Minutes)
+let filterArticlesByAge (maxAgeInSeconds    : Seconds)
                         (articles           : NewsArticle seq) =
-    let maxAge = TimeSpan.FromMinutes(maxAgeInMinutes)
+    let maxAge = TimeSpan.FromSeconds(maxAgeInSeconds)
     articles
     |> Seq.filter (fun a -> 
         DateTime.UtcNow - a.PublishDate.ToUniversalTime() <= maxAge)
 
-let PostToHackerNews data =
+let postToHackerNews data =
     (hackerNewsHttpClient, hackerNewsFormActionUrl, data)
     |||> Curler.postForm
 
 [<EntryPoint>]
 let main argv = 
-    newsFeeds
-    |> Seq.collect (Curler.getStream defaultHttpClient >> FeedParser.parseFeed)
-    |> Seq.distinct
-    |> filterArticlesByAge maxAgeInMinutes
-    |> Seq.map ConvertToFormData
-    |> Seq.iter PostToHackerNews    
+    printfn "Starting News Hacker."
+    while true do
+        printfn "Checking for new articles..."
+
+        newsFeeds
+        |> Seq.collect (Curler.getStream defaultHttpClient >> FeedParser.parseFeed)
+        |> Seq.distinct
+        |> filterArticlesByAge maxAgeInSeconds
+        |> Seq.map convertToFormData
+        |> Seq.iter postToHackerNews
+
+        printfn "Taking a nap. zzZZ"
+
+        let napTime = TimeSpan.FromSeconds(sleepTimeInSeconds)
+        Thread.Sleep(napTime)
     0
