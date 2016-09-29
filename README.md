@@ -3,4 +3,4 @@ A small bot which regularly checks popular blogs and news feeds for new articles
 
 [![Build Status](https://travis-ci.org/dustinmoris/NewsHacker.svg)](https://travis-ci.org/dustinmoris/NewsHacker)
 
-[![Build history](https://buildstats.info/travisci/chart/dustinmoris/newshacker)](https://travis-ci.org/dustinmoris/NewsHacker?branch=master)
+[![Build history](https://buildstats.info/travisci/chart/dustinmoris/NewsHacker)](https://travis-ci.org/dustinmoris/NewsHacker?branch=master)
