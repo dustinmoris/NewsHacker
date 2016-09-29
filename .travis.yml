@@ -15,12 +15,15 @@ install:
   - wget "https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-alpha.10/powershell_6.0.0-alpha.10-1ubuntu1.14.04.1_amd64.deb"
   - sudo apt-get install libunwind8 libicu52
   - sudo dpkg -i powershell_6.0.0-alpha.10-1ubuntu1.14.04.1_amd64.deb
-  - powershell -command $psversiontable
 script:
   - dotnet restore
   - dotnet build -c Release src
   - dotnet publish -c Release src
 after_success:
-  - docker build -t dustinmoris/newshacker src/bin/Release/netcoreapp1.0/publish/.  
+  - powershell src/bin/Release/netcoreapp1.0/publish/semver.ps1
+  - docker build -t dustinmoris/newshacker:$SEM_VER src/bin/Release/netcoreapp1.0/publish/.
+  - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:$MAJOR_VER
+  - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
+  - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:latest
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push dustinmoris/newshacker
