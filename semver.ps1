@@ -1,11 +1,17 @@
 param ($dllPath)
-$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($dllPath).FileVersion
-$majorVer = $version.Major
-$minorVer = $version.Minor
-$buildVer = $version.Build
-$semVer = "$($version.Major).$($version.Minor).$($version.Build)"
 
-[Environment]::SetEnvironmentVariable("SEM_VER", $semVer, "Machine")
-[Environment]::SetEnvironmentVariable("MAJOR_VER", $majorVer, "Machine")
-[Environment]::SetEnvironmentVariable("MINOR_VER", $minorVer, "Machine")
-[Environment]::SetEnvironmentVariable("BUILD_VER", $buildVer, "Machine")
+# $version = (Get-Item $dllPath).VersionInfo.FileVersion
+
+# $buildVer = $version.Build
+# $minorVer = $version.Minor
+# $majorVer = $version.Major
+# $semVer = "$($version.Major).$($version.Minor).$($version.Build)"
+
+# $env:BUILD_VER = $buildVer
+# $env:MINOR_VER = $minorVer
+# $env:MAJOR_VER = $majorVer
+# $env:SEM_VER = $semVer
+
+$env:MAJOR_VER = 0
+$env:MINOR_VER = 1
+$env:BUILD_VER = 0
