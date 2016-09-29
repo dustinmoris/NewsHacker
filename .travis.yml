@@ -3,6 +3,7 @@ sudo: required
 dist: trusty  
 env:  
   - CLI_VERSION=latest
+  - DOTNET_CLI_TELEMETRY_OPTOUT=1
 os:  
   - linux
 branches:  
@@ -20,10 +21,10 @@ script:
   - dotnet build -c Release src
   - dotnet publish -c Release src
 after_success:
-  - powershell src/bin/Release/netcoreapp1.0/publish/semver.ps1
+  - powershell src/bin/Release/netcoreapp1.0/publish/semver.ps1 "NewsHacker.dll"
   - docker build -t dustinmoris/newshacker:$SEM_VER src/bin/Release/netcoreapp1.0/publish/.
   - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:$MAJOR_VER
   - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
   - docker tag dustinmoris/newshacker:$SEM_VER dustinmoris/newshacker:latest
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push dustinmoris/newshacker
+  - docker push dustinmoris/newshacker:$SEM_VER
