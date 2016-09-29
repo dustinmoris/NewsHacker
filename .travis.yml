@@ -22,3 +22,6 @@ after_success:
   - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:latest
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER
+  - docker push dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
+  - docker push dustinmoris/newshacker:$MAJOR_VER
+  - docker push dustinmoris/newshacker:latest
