@@ -137,6 +137,13 @@ let newsFeeds =
         "http://feeds.feedburner.com/TroyHunt"
         "https://blogs.msdn.microsoft.com/dotnet/feed/"
         "http://techblog.netflix.com/rss.xml"
+        "http://feeds.macrumors.com/MacRumors-All"
+        "http://feeds.feedburner.com/HighScalability"
+        "https://news.bitcoin.com/feed"
+        "https://blogs.msdn.microsoft.com/dotnet/feed/"
+        "https://blogs.msdn.microsoft.com/typescript/feed/"
+        "https://blogs.msdn.microsoft.com/visualstudio/feed/"
+        "https://code.visualstudio.com/feed.xml"
     ]
 
 let hackerNewsBaseUrl       = "https://news.ycombinator.com"
