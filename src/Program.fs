@@ -198,6 +198,13 @@ let filterArticlesByAge (maxAgeInSeconds    : Seconds)
     |> Seq.filter (fun a -> 
         DateTime.UtcNow - a.PublishDate.ToUniversalTime() <= maxAge)
 
+let skipArticlesWithTitleMoreThan80Characters (articles : NewsArticle seq) =
+    articles
+    |> Seq.filter (fun a -> 
+        let predicate = a.Title.Length <= 80
+        if predicate then printfn "Skipping article %s because the title is %d characters long." a.Title a.Title.Length
+        predicate)
+
 let postToHackerNews data =
     (hackerNewsHttpClient, hackerNewsFormActionUrl, data)
     |||> Curler.postForm
@@ -212,6 +219,7 @@ let main argv =
         |> Seq.collect (Curler.getStream defaultHttpClient >> FeedParser.parseFeed)
         |> Seq.distinct
         |> filterArticlesByAge maxAgeInSeconds
+        |> skipArticlesWithTitleMoreThan80Characters
         |> Seq.map convertToFormData
         |> Seq.iter postToHackerNews
 
