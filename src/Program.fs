@@ -58,10 +58,17 @@ module Config =
 
 module Curler =
 
-    let printInfo (data : KeyValuePair<string, string> seq ) =
-        let title = data |> Seq.find (fun (x : KeyValuePair<string,string>) -> x.Key = "title")
-        let url   = data |> Seq.find (fun (x : KeyValuePair<string,string>) -> x.Key = "url")
-        printfn "Publising [%s](%s)" title.Value url.Value
+    let get (key : string) (data : KeyValuePair<string, string> seq) =
+        data |> Seq.find (fun kvp -> kvp.Key = key)
+
+    let formatFormData (data : KeyValuePair<string, string> seq) =
+        ((data |> get "title").Value,
+         (data |> get "url"  ).Value)
+        ||> sprintf "[%s](%s)"
+
+    let printInfo (data : KeyValuePair<string, string> seq)  =
+        formatFormData data
+        |> printfn "Publising %s"
 
     let runSynchronously task =
         task
@@ -80,9 +87,14 @@ module Curler =
 
     let postForm (httpClient : HttpClient) (url : string) (data) =      
         printInfo data
-        httpClient.PostAsync(url, new FormUrlEncodedContent(data))
-        |> runSynchronously        
-        |> ignore
+        
+        let response =
+            httpClient.PostAsync(url, new FormUrlEncodedContent(data))
+            |> runSynchronously
+        
+        if not response.IsSuccessStatusCode then
+            printfn "Failed to publish article %s." (formatFormData data)
+            printfn "Hacker News returned %d" (response.StatusCode |> int)        
 
 // ----------------------------------------------------------
 // FeedParser
