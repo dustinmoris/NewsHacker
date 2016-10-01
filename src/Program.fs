@@ -120,16 +120,17 @@ module FeedParser =
 
     let getValue (e : XElement) = e.Value
 
-    let fixTimeZoneIdentifier (s : string) = s.Replace("PDT", "-0700")
+    let fixTimeZoneIdentifier       (s : string) = s.Replace("PDT", "-0700")
+    let removeTechCrunchQueryString (s : string) = s.Replace("?ncid=rss", "")
 
     let parseArticle (element : XElement) =
         element 
         |> getChildElements
         |> (fun elems ->
             let url = 
-                match elems |> tryFindChild "feedburner:origLink" with
+                match elems |> tryFindChild "origLink" with
                 | None      -> elems |> findChild "link" |> getValue
-                | Some link -> link  |> getValue
+                | Some link -> link  |> getValue |> removeTechCrunchQueryString
             {
                 Url         = url
                 Title       = elems |> findChild "title"   |> getValue
@@ -211,7 +212,7 @@ let skipArticlesWithTitleMoreThan80Characters (articles : NewsArticle seq) =
     articles
     |> Seq.filter (fun a -> 
         let predicate = a.Title.Length <= 80
-        if predicate then printfn "Skipping article %s because the title is %d characters long." a.Title a.Title.Length
+        if not predicate then printfn "Skipping article %s because the title is %d characters long." a.Title a.Title.Length
         predicate)
 
 let postToHackerNews data =
