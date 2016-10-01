@@ -110,20 +110,30 @@ module FeedParser =
         elems
         |> Seq.find (byName name)
 
+    let tryFindChild (name : string) (elems : XElement seq) =
+        elems
+        |> Seq.tryFind (byName name)
+
     let filterChildElements (name : string) (elems : XElement seq) =
         elems
         |> Seq.filter (byName name)
 
     let getValue (e : XElement) = e.Value
 
-    let parseNewsArticle (element : XElement) =
+    let fixTimeZoneIdentifier (s : string) = s.Replace("PDT", "-0700")
+
+    let parseArticle (element : XElement) =
         element 
         |> getChildElements
         |> (fun elems ->
+            let url = 
+                match elems |> tryFindChild "feedburner:origLink" with
+                | None      -> elems |> findChild "link" |> getValue
+                | Some link -> link  |> getValue
             {
-                Url         = elems |> findChild "link"    |> getValue
+                Url         = url
                 Title       = elems |> findChild "title"   |> getValue
-                PublishDate = elems |> findChild "pubDate" |> getValue |> DateTime.Parse
+                PublishDate = elems |> findChild "pubDate" |> getValue |> fixTimeZoneIdentifier |> DateTime.Parse
             })
 
     let parseFeed (stream : Stream) =
@@ -131,7 +141,7 @@ module FeedParser =
         |> findChild "channel"
         |> getChildElements
         |> filterChildElements "item"
-        |> Seq.map parseNewsArticle
+        |> Seq.map parseArticle
 
 // ----------------------------------------------------------
 // Main
@@ -155,7 +165,6 @@ let newsFeeds =
         "https://blogs.msdn.microsoft.com/dotnet/feed/"
         "https://blogs.msdn.microsoft.com/typescript/feed/"
         "https://blogs.msdn.microsoft.com/visualstudio/feed/"
-        "https://code.visualstudio.com/feed.xml"
     ]
 
 let hackerNewsBaseUrl       = "https://news.ycombinator.com"
