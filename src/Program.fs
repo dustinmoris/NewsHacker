@@ -151,7 +151,6 @@ module FeedParser =
 // Set config values
 let newsFeeds =
     [
-        "http://feeds.feedburner.com/TechCrunch/"
         "http://feeds.feedburner.com/TechCrunchIT"
         "http://feeds.feedburner.com/TechCrunch/Microsoft"
         "http://feeds.feedburner.com/TechCrunch/Twitter"
@@ -227,7 +226,7 @@ let main argv =
 
         newsFeeds
         |> Seq.collect (Curler.getStream defaultHttpClient >> FeedParser.parseFeed)
-        |> Seq.distinct
+        |> Seq.distinctBy (fun a -> a.Title)
         |> filterArticlesByAge maxAgeInSeconds
         |> skipArticlesWithTitleMoreThan80Characters
         |> Seq.map convertToFormData
