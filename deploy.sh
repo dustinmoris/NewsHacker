@@ -29,5 +29,5 @@ if [ -n "$TRAVIS_TAG" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
     docker push dustinmoris/newshacker:$SEMVER
     docker push dustinmoris/newshacker:latest
-
+    
 fi
