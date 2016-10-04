@@ -1,6 +1,8 @@
 language: generic
-sudo: required  
-dist: trusty  
+sudo: required
+dist: trusty
+os:
+  - linux
 install:
   # Install and configure the .NET Core CLI
   - export CLI_VERSION=latest
