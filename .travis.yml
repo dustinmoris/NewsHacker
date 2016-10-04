@@ -1,27 +1,41 @@
+language: generic
 sudo: required  
 dist: trusty  
-env:  
-  - CLI_VERSION=latest DOTNET_CLI_TELEMETRY_OPTOUT=1 MAJOR_VER=0 MINOR_VER=3 BUILD_VER=3
-os:  
-  - linux
-branches:  
-  only:
-    - master
-install:  
+install:
+  # Install and configure the .NET Core CLI
+  - export CLI_VERSION=latest
   - export DOTNET_INSTALL_DIR="$PWD/.dotnetcli"
   - curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh | bash /dev/stdin --version "$CLI_VERSION" --install-dir "$DOTNET_INSTALL_DIR"
   - export PATH="$DOTNET_INSTALL_DIR:$PATH"
+  - export DOTNET_CLI_TELEMETRY_OPTOUT=1 
 script:
   - dotnet restore
   - dotnet build -c Release src
   - dotnet publish -c Release src
 after_success:
-  - docker build -t dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER src/bin/Release/netcoreapp1.0/publish/.
-  - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:$MAJOR_VER
-  - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
-  - docker tag dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER dustinmoris/newshacker:latest
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER.$BUILD_VER
-  - docker push dustinmoris/newshacker:$MAJOR_VER.$MINOR_VER
-  - docker push dustinmoris/newshacker:$MAJOR_VER
-  - docker push dustinmoris/newshacker:latest
+  - if [ -n "$TRAVIS_TAG" ]; then
+    # Read the tag name into an array split by the dot (.)
+    IFS='.' read -r -a tag <<< "$TRAVIS_TAG"
+
+    # Remove a leading v from the major version number (e.g. if the tag was v1.0.0)
+    MAJOR="${${tag[0]}//v}"
+    
+    # Set the other parts of the sem ver to respective variables as well
+    MINOR=${tag[1]}
+    BUILD=${tag[2]}
+
+    # Create a clean sem ver variable
+    SEMVER="$MAJOR.$MINOR.$BUILD"
+
+    # Build the Docker image
+    docker build -t dustinmoris/newshacker:$SEMVER src/bin/Release/netcoreapp1.0/publish/.
+
+    # Tag the same image with :latest as well
+    docker tag dustinmoris/newshacker:$SEMVER dustinmoris/newshacker:latest
+
+    # Login to Docker Hub and upload images
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    docker push dustinmoris/newshacker:$SEMVER
+    docker push dustinmoris/newshacker:latest
+
+    fi
