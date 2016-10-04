@@ -94,7 +94,7 @@ module Curler =
         
         if not response.IsSuccessStatusCode then
             printfn "Failed to publish article %s." (formatFormData data)
-            printfn "Hacker News returned %d" (response.StatusCode |> int)        
+            printfn "Hacker News returned %d" (response.StatusCode |> int)
 
 // ----------------------------------------------------------
 // FeedParser
@@ -151,6 +151,7 @@ module FeedParser =
 // Set config values
 let newsFeeds =
     [
+        "http://feeds.feedburner.com/TechCrunch"
         "http://feeds.feedburner.com/TechCrunchIT"
         "http://feeds.feedburner.com/TechCrunch/Microsoft"
         "http://feeds.feedburner.com/TechCrunch/Twitter"
