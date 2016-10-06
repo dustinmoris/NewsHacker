@@ -28,7 +28,7 @@
   "publishOptions": {
     "include": [
       "Dockerfile",
-      "deploy.sh"
+      "../deploy.sh"
     ]
   }
 }
