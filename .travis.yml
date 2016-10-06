@@ -5,8 +5,4 @@ mono: none
 dotnet: 1.0.0-preview2-003131
 install:
   - export DOTNET_CLI_TELEMETRY_OPTOUT=1 
-script:
-  - dotnet restore
-  - dotnet build -c Release src
-  - dotnet publish -c Release src
-after_success: ./deploy.sh
+script: ./build.sh

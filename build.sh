@@ -3,6 +3,18 @@
 # Stop the script if a command returns a non 0 exit code
 set -ev
 
+# ---------------------------------
+# BUILD
+# ---------------------------------
+
+dotnet restore
+dotnet build -c Release src
+dotnet publish -c Release src
+
+# ---------------------------------
+# DEPLOY
+# ---------------------------------
+
 # Only publish to Docker Hub on tags
 if [ -n "$TRAVIS_TAG" ]; then
 
