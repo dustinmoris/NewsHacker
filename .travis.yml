@@ -9,5 +9,4 @@ script:
   - dotnet restore
   - dotnet build -c Release src
   - dotnet publish -c Release src
-after_success:
-  - ./deploy.sh
+after_success: ./deploy.sh
