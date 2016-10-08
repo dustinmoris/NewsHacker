@@ -151,7 +151,6 @@ module FeedParser =
 // Set config values
 let newsFeeds =
     [
-        "http://feeds.feedburner.com/TechCrunch"
         "http://feeds.feedburner.com/TechCrunchIT"
         "http://feeds.feedburner.com/TechCrunch/Microsoft"
         "http://feeds.feedburner.com/TechCrunch/Twitter"
@@ -161,7 +160,6 @@ let newsFeeds =
         "https://blogs.msdn.microsoft.com/dotnet/feed/"
         "http://techblog.netflix.com/rss.xml"
         "http://feeds.feedburner.com/HighScalability"
-        "https://news.bitcoin.com/feed"
         "https://blogs.msdn.microsoft.com/dotnet/feed/"
         "https://blogs.msdn.microsoft.com/typescript/feed/"
         "https://blogs.msdn.microsoft.com/visualstudio/feed/"
@@ -218,9 +216,15 @@ let postToHackerNews data =
     (hackerNewsHttpClient, hackerNewsFormActionUrl, data)
     |||> Curler.postForm
 
+let asciiArt = " _   _                     _   _            _             
+| \ | | _____      _____  | | | | __ _  ___| | _____ _ __ 
+|  \| |/ _ \ \ /\ / / __| | |_| |/ _` |/ __| |/ / _ \ '__|
+| |\  |  __/\ V  V /\__ \ |  _  | (_| | (__|   <  __/ |   
+|_| \_|\___| \_/\_/ |___/ |_| |_|\__,_|\___|_|\_\___|_|   "
+
 [<EntryPoint>]
 let main argv = 
-    printfn "Starting News Hacker."
+    printfn "%s" asciiArt
     while true do
         printfn "Checking for new articles..."
 

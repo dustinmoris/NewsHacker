@@ -3,6 +3,11 @@
 # Stop the script if a command returns a non 0 exit code
 set -ev
 
+# Check if the variables exist otherwise read from shell arguments
+TRAVIS_TAG=${TRAVIS_TAG:-$1}
+DOCKER_USERNAME=${DOCKER_USERNAME:-$2}
+DOCKER_PASSWORD=${DOCKER_PASSWORD:-$3}
+
 # ---------------------------------
 # BUILD
 # ---------------------------------
@@ -22,7 +27,7 @@ if [ -n "$TRAVIS_TAG" ]; then
     IFS='.' read -r -a tag <<< "$TRAVIS_TAG"
 
     # Remove a leading v from the major version number (e.g. if the tag was v1.0.0)
-    MAJOR="${${tag[0]}//v}"
+    MAJOR="${tag[0]//v}"
 
     # Set the other parts of the sem ver to respective variables as well
     MINOR=${tag[1]}
