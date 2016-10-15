@@ -93,8 +93,9 @@ module Curler =
             |> runSynchronously
         
         if not response.IsSuccessStatusCode then
+            let responseMessage = response.Content.ReadAsStringAsync() |> runSynchronously
             printfn "Failed to publish article %s." (formatFormData data)
-            printfn "Hacker News returned %d" (response.StatusCode |> int)
+            printfn "Hacker News Response StatusCode: %d, Message: %s" (response.StatusCode |> int) responseMessage
 
 // ----------------------------------------------------------
 // FeedParser
