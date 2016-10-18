@@ -156,6 +156,8 @@ let newsFeeds =
         "http://feeds.feedburner.com/TechCrunch/Microsoft"
         "http://feeds.feedburner.com/TechCrunch/Twitter"
         "http://feeds.feedburner.com/TechCrunch/Google"
+        "http://feeds.feedburner.com/TechCrunch/Yahoo"
+        "http://feeds.feedburner.com/TechCrunch/LinkedIn"
         "http://feeds.hanselman.com/ScottHanselman"
         "http://feeds.feedburner.com/TroyHunt"
         "https://blogs.msdn.microsoft.com/dotnet/feed/"
