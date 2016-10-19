@@ -150,30 +150,13 @@ module FeedParser =
 // ----------------------------------------------------------
 
 // Set config values
-let newsFeeds =
-    [
-        "http://feeds.feedburner.com/TechCrunchIT"
-        "http://feeds.feedburner.com/TechCrunch/Microsoft"
-        "http://feeds.feedburner.com/TechCrunch/Twitter"
-        "http://feeds.feedburner.com/TechCrunch/Google"
-        "http://feeds.feedburner.com/TechCrunch/Yahoo"
-        "http://feeds.feedburner.com/TechCrunch/LinkedIn"
-        "http://feeds.hanselman.com/ScottHanselman"
-        "http://feeds.feedburner.com/TroyHunt"
-        "https://blogs.msdn.microsoft.com/dotnet/feed/"
-        "http://techblog.netflix.com/rss.xml"
-        "http://feeds.feedburner.com/HighScalability"
-        "https://blogs.msdn.microsoft.com/dotnet/feed/"
-        "https://blogs.msdn.microsoft.com/typescript/feed/"
-        "https://blogs.msdn.microsoft.com/visualstudio/feed/"
-    ]
-
 let hackerNewsBaseUrl       = "https://news.ycombinator.com"
 let hackerNewsFormUrl       = hackerNewsBaseUrl + "/submit"
 let hackerNewsFormActionUrl = hackerNewsBaseUrl + "/r"
 let userCookieValue         = Config.getValue "USER_COOKIE"
 let maxAgeInSeconds         = Config.getValue "MAX_AGE"    |> Double.Parse
 let sleepTimeInSeconds      = Config.getValue "SLEEP_TIME" |> Double.Parse
+let feedListUrl             = Config.getValue "FEED_LIST_URL"
 
 // Configure HttpClient for querying news newsFeeds
 let defaultHttpClient = new HttpClient()
@@ -188,6 +171,12 @@ let httpHandler           = new HttpClientHandler(CookieContainer = cookies)
 let hackerNewsHttpClient  = new HttpClient(httpHandler)
 
 hackerNewsHttpClient.DefaultRequestHeaders.Referrer <- new Uri(hackerNewsBaseUrl)
+
+// Retrieve the list of new feeds
+let newsFeeds =
+    feedListUrl
+    |> Curler.getString defaultHttpClient
+    |> fun x -> x.Split([| '\n' |])
 
 // Core Domain Logic
 let extractFnid (html : string) =
@@ -228,6 +217,12 @@ let asciiArt = " _   _                     _   _            _
 [<EntryPoint>]
 let main argv = 
     printfn "%s" asciiArt
+    printfn ""
+
+    printfn "List of news feeds:"
+    newsFeeds
+    |> Seq.iter (fun x -> printfn "%s" x)
+
     while true do
         printfn "Checking for new articles..."
 
