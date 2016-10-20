@@ -1,6 +1,6 @@
 {
   "name": "NewsHacker",
-  "version": "0.3.4-*",
+  "version": "0.6.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "compilerName": "fsc",
@@ -27,8 +27,7 @@
   },
   "publishOptions": {
     "include": [
-      "Dockerfile",
-      "../build.sh"
+      "Dockerfile"
     ]
   }
 }

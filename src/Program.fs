@@ -172,8 +172,8 @@ let hackerNewsHttpClient  = new HttpClient(httpHandler)
 
 hackerNewsHttpClient.DefaultRequestHeaders.Referrer <- new Uri(hackerNewsBaseUrl)
 
-// Retrieve the list of new feeds
-let newsFeeds =
+// Retrieve the list of news feeds
+let newsFeeds=
     feedListUrl
     |> Curler.getString defaultHttpClient
     |> fun x -> x.Split([| '\n' |])
