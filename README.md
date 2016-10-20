@@ -8,10 +8,10 @@ A small bot which regularly checks popular blogs and news feeds for new articles
 ## Usage
 
 ```
-docker run -e USER_COOKIE="<your user cookie value>" dustinmoris/newshacker:latest
+docker run -e USER_COOKIE="<your user cookie value>" -e FEED_LIST_URL="<public url to a list of rss feeds>" dustinmoris/newshacker:latest
 ```
 
-You must speicify the `USER_COOKIE` environment variable when launching the container. This variable expects the value from the Hacker News `user` cookie.
+You must speicify the `USER_COOKIE` and the `FEED_LIST_URL` environment variables when launching the container. The `USER_COOKIE` variable expects the value from the Hacker News `user` cookie and the `FEED_LIST_URL` variable expects a URL to a list of RSS feeds ([example](https://raw.githubusercontent.com/dustinmoris/NewsHacker/master/feedlist.txt)).
 
 ### Optional parameters
 

@@ -222,6 +222,7 @@ let main argv =
     printfn "List of news feeds:"
     newsFeeds
     |> Seq.iter (fun x -> printfn "%s" x)
+    printfn ""
 
     while true do
         printfn "Checking for new articles..."
