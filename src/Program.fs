@@ -76,7 +76,6 @@ module Curler =
         |> Async.RunSynchronously
 
     let getStream (httpClient : HttpClient) (url : string) =
-        printfn "Requesting data from %s" url
         try
             url
             |> httpClient.GetStreamAsync
@@ -241,9 +240,6 @@ let main argv =
     printfn ""
 
     while true do
-        printfn ""
-        printfn "Checking for new articles..."
-
         newsFeeds
         |> Seq.map (Curler.getStream defaultHttpClient)
         |> Seq.filter hasValue
@@ -255,8 +251,6 @@ let main argv =
         |> skipArticlesWithTitleMoreThan80Characters
         |> Seq.map convertToFormData
         |> Seq.iter postToHackerNews
-
-        printfn "Taking a nap. zzZZ"
 
         let napTime = TimeSpan.FromSeconds(sleepTimeInSeconds)
         Thread.Sleep(napTime)
