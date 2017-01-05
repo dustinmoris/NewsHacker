@@ -75,10 +75,17 @@ module Curler =
         |> Async.AwaitTask
         |> Async.RunSynchronously
 
-    let getStream (httpClient : HttpClient) (url : string) = 
-        url
-        |> httpClient.GetStreamAsync
-        |> runSynchronously
+    let getStream (httpClient : HttpClient) (url : string) =
+        printfn "Requesting data from %s" url
+        try
+            url
+            |> httpClient.GetStreamAsync
+            |> runSynchronously
+            |> Some
+        with ex ->
+            printfn "Failed to retrieve data from %s" url
+            printfn "Error message: %s" ex.Message
+            None
 
     let getString (httpClient : HttpClient) (url : string) = 
         url
@@ -139,11 +146,16 @@ module FeedParser =
             })
 
     let parseFeed (stream : Stream) =
-        XDocument.Load(stream).Root.Descendants()
-        |> findChild "channel"
-        |> getChildElements
-        |> filterChildElements "item"
-        |> Seq.map parseArticle
+        try
+            XDocument.Load(stream).Root.Descendants()
+            |> findChild "channel"
+            |> getChildElements
+            |> filterChildElements "item"
+            |> Seq.map parseArticle
+            |> Some
+        with ex ->
+            printfn "Failed to parse feed."
+            None
 
 // ----------------------------------------------------------
 // Main
@@ -208,6 +220,10 @@ let postToHackerNews data =
     (hackerNewsHttpClient, hackerNewsFormActionUrl, data)
     |||> Curler.postForm
 
+let hasValue (item : 'T option) = item.IsSome
+
+let getValue (item : 'T option) = item.Value
+
 let asciiArt = " _   _                     _   _            _             
 | \ | | _____      _____  | | | | __ _  ___| | _____ _ __ 
 |  \| |/ _ \ \ /\ / / __| | |_| |/ _` |/ __| |/ / _ \ '__|
@@ -225,10 +241,15 @@ let main argv =
     printfn ""
 
     while true do
+        printfn ""
         printfn "Checking for new articles..."
 
         newsFeeds
-        |> Seq.collect (Curler.getStream defaultHttpClient >> FeedParser.parseFeed)
+        |> Seq.map (Curler.getStream defaultHttpClient)
+        |> Seq.filter hasValue
+        |> Seq.map (getValue >> FeedParser.parseFeed)
+        |> Seq.filter hasValue
+        |> Seq.collect getValue
         |> Seq.distinctBy (fun a -> a.Title)
         |> filterArticlesByAge maxAgeInSeconds
         |> skipArticlesWithTitleMoreThan80Characters
