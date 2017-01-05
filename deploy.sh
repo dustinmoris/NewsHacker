@@ -20,7 +20,7 @@ BUILD=${tag_array[2]}
 SEMVER="$MAJOR.$MINOR.$BUILD"
 
 # Build the Docker images
-docker build -t dustinmoris/newshacker:$SEMVER src/bin/Release/netcoreapp1.0/publish/.
+docker build -t dustinmoris/newshacker:$SEMVER src/bin/Release/netcoreapp1.1/publish/.
 docker tag dustinmoris/newshacker:$SEMVER dustinmoris/newshacker:latest
 
 # Login to Docker Hub and upload images
